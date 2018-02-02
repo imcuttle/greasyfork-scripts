@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name New Script
+// @name SwaggerUI Search Supportting
 // @namespace Violentmonkey Scripts
 // @match *://*/*/swagger-ui.html*
 // @match *://*/swagger-ui.html*
