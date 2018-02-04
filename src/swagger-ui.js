@@ -454,34 +454,47 @@ window.addEventListener('load', function () {
 
             if (url) {
 
+              function analysisData(data) {
+                console.log('data', data)
+                $.each(data.paths, function (path, methodSet) {
+                  $.each(methodSet, function (method, methodEntity) {
+                    // @todo:: array ??
+                    methodEntity.tags.join(',')
+                    methodEntity.operationId
+                    methodEntity.summary
+
+                    list.push({
+                      methodEntity: methodEntity,
+                      url: '!/' + methodEntity.tags.join(',') + '/' + methodEntity.operationId,
+                      s: methodEntity.summary,
+                      m: method,
+                      p: path
+                    })
+                  })
+                })
+
+                console.log('list', list)
+                dom.insertAfter( swaggerVersion === 1 ? $('#header') : $('.topbar'))
+              }
+
               $.ajax({
                 url: url,
                 dataType: 'text',
                 success: function (data) {
-                  // json string is error
-                  data = eval('x = ' + data + '\n x;')
-                  console.log('data', data)
-                  $.each(data.paths, function (path, methodSet) {
-                    $.each(methodSet, function (method, methodEntity) {
-                      // @todo:: array ??
-                      methodEntity.tags.join(',')
-                      methodEntity.operationId
-                      methodEntity.summary
-
-                      list.push({
-                        methodEntity: methodEntity,
-                        url: '!/' + methodEntity.tags.join(',') + '/' + methodEntity.operationId,
-                        s: methodEntity.summary,
-                        m: method,
-                        p: path
-                      })
-                    })
-
-
-                  })
-
-                  console.log('list', list)
-                  dom.insertAfter( swaggerVersion === 1 ? $('#header') : $('.topbar'))
+                  if (/^\s*[{[]/.test(data)) {
+                    // json string is error
+                    data = eval('x = ' + data + '\n x;')
+                    analysisData(data)
+                  } else {
+                    // yaml text
+                    var script = document.createElement('script')
+                    script.src = '//cdn.bootcss.com/js-yaml/3.10.0/js-yaml.min.js'
+                    document.head.appendChild(script)
+                    script.onload = function () {
+                      data = jsyaml.safeLoad(data)
+                      analysisData(data)
+                    }
+                  }
                 }
               })
             }
